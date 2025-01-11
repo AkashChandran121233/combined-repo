@@ -5,119 +5,71 @@ import axios from 'axios';
 import NavBar from '../Components/Navbar';
 import { AiFillLike } from "react-icons/ai";
 import { FaUserCircle } from "react-icons/fa";
+
 function SinglePage() {
   const location = useLocation();
   const { book } = location.state || {};
   const navigate = useNavigate();
 
   const goBack = () => {
-    console.log('Back clicked'); // Log book details
     navigate('/books');
   };
 
-  //============================================
-
   const [userDetails, setUserDetails] = useState();
+  const [Like, setLike] = useState(0);
+  const [comment, setComment] = useState("");
+  const [inputComment, setInputComment] = useState("");
 
   useEffect(() => {
     const storedUserDetails = JSON.parse(localStorage.getItem("userDetails"));
     if (storedUserDetails) {
-      console.log("Stored User Details:", storedUserDetails);
       setUserDetails(storedUserDetails);
     }
   }, []);
 
-  const [Like, setLike] = useState()
-  const [comment, setComment] = useState("")
-
-  const [inputComment, setInputComment] = useState("")
   useEffect(() => {
     axios.get('http://localhost:3001/Like', { params: { title: book.title } })
-      .then((response) => {
-        setLike(response.data);
-      })
-      .catch((error) => {
-        console.error('Error fetching comments:', error);
-      });
-
+      .then((response) => setLike(response.data))
+      .catch((error) => console.error('Error fetching likes:', error));
   }, [book.title]);
 
   useEffect(() => {
     axios.get('http://localhost:3001/comment', { params: { title: book.title } })
-      .then((response) => {
-        setComment(response.data);
-      })
-      .catch((error) => {
-        console.error('Error fetching books:', error);
-      });
-
+      .then((response) => setComment(response.data))
+      .catch((error) => console.error('Error fetching comments:', error));
   }, [book.title]);
 
   const handleRentBook = (e) => {
     e.preventDefault();
-    axios.post('http://localhost:3001/singlepage', { name: userDetails.name, title: book.title, email: userDetails.email, status: "Pending", ExpiryTime: null, Expire: false })
-      .then(result => {
-        console.log(result)
-
-      })
-      .catch(err => {
-        if (err.response && err.response.status === 400) {
-          console.log("Something Went Wrong in handleRentBook");
-        }
-        else {
-          console.log("An error occurred. Please try again in handleRentBook");
-        }
-        console.error(err)
-      })
-    navigate('/bookrequest');
-
-
+    axios.post('http://localhost:3001/singlepage', {
+      name: userDetails.name,
+      title: book.title,
+      email: userDetails.email,
+      status: "Pending",
+      ExpiryTime: null,
+      Expire: false
+    })
+      .then(() => navigate('/bookrequest'))
+      .catch((err) => console.error('Error renting the book:', err));
   };
 
-
   const handleLike = (e) => {
-
     e.preventDefault();
     axios.put('http://localhost:3001/like', { title: book.title })
-      .then(result => {
-        console.log(result)
-      })
-      .catch(err => {
-        if (err.response && err.response.status === 400) {
-          console.log("Something Went Wrong in handleLike.");
-        }
-        else {
-          console.log("An error occurred. Please try again in handleLike");
-        }
-        console.error(err)
-
-      })
-    window.location.reload();
-
+      .then(() => setLike((prev) => prev + 1))
+      .catch((err) => console.error('Error liking the book:', err));
   };
 
   const handleComment = (e) => {
-
     e.preventDefault();
-    axios.put('http://localhost:3001/comment', { title: book.title, inputComment: inputComment })
-      .then(result => {
-        console.log(result)
+    if (!inputComment.trim()) return;
+    axios.put('http://localhost:3001/comment', { title: book.title, inputComment })
+      .then(() => {
+        setComment((prev) => ${prev},${inputComment});
+        setInputComment("");
       })
-      .catch(err => {
-        if (err.response && err.response.status === 400) {
-          console.log("Something Went Wrong in handleComment.");
-        }
-        else {
-          console.log("An error occurred. Please try again in handleComment.");
-        }
-        console.error(err)
-
-      })
-    window.location.reload();
-
+      .catch((err) => console.error('Error adding comment:', err));
   };
-
-  //============================================
 
   if (!book) {
     return (
@@ -164,7 +116,7 @@ function SinglePage() {
           {/* Book Cover */}
           <div>
             <img
-              src={book.url || 'https://via.placeholder.com/300x400?text=No+Cover+Available'} // Use the book's imageUrl from the database
+              src={book.url || 'https://via.placeholder.com/300x400?text=No+Cover+Available'}
               alt={book.title}
               style={{
                 width: '300px',
@@ -227,10 +179,8 @@ function SinglePage() {
                 textTransform: 'uppercase',
                 transition: 'all 0.3s ease',
               }}
-              onMouseEnter={(e) => (e.target.style.backgroundColor = 'white') || (e.target.style.color = 'red')}
-              onMouseLeave={(e) => (e.target.style.backgroundColor = 'red') || (e.target.style.color = 'white')}
             >
-              RentBook
+              Rent Book
             </button>
             <button
               onClick={goBack}
@@ -244,41 +194,92 @@ function SinglePage() {
                 cursor: 'pointer',
                 textTransform: 'uppercase',
                 transition: 'all 0.3s ease',
-                marginLeft: '10px'
+                marginLeft: '10px',
               }}
-              onMouseEnter={(e) => (e.target.style.backgroundColor = 'white') || (e.target.style.color = 'red')}
-              onMouseLeave={(e) => (e.target.style.backgroundColor = 'red') || (e.target.style.color = 'white')}
             >
               Back
             </button>
             <br /><br />
-            <button onClick={handleLike} style={{ textDecoration: 'none', border: 'none', background: 'none', color: 'white' }}><AiFillLike style={{ color: 'white', fontSize: '35px' }} />{Like > 0 ? Like : ""} </button>
-
+            <button
+              onClick={handleLike}
+              style={{
+                backgroundColor: 'transparent',
+                border: 'none',
+                cursor: 'pointer',
+              }}
+            >
+              <AiFillLike style={{ color: 'red', fontSize: '35px' }} /> {Like > 0 ? Like : ""}
+            </button>
           </div>
         </div>
       </div>
 
-      <h2>Comments</h2>
-      <div>
-
-        <p><FaUserCircle />  <input name='bookcomment' placeholder='Add a comment' onChange={(e) => setInputComment(e.target.value)} />  <button onClick={handleComment}>Post</button> </p>
+      <div style={{ padding: '20px', color: 'white' }}>
+        <h2 style={{ color: 'red', textTransform: 'uppercase', fontFamily:'monospace',fontSize:'25px' }}>Comments</h2>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+            marginBottom: '20px',
+          }}
+        >
+          <FaUserCircle style={{ fontSize: '24px', color: 'red' }} />
+          <input
+            name="bookcomment"
+            placeholder="Add a comment"
+            onChange={(e) => setInputComment(e.target.value)}
+            style={{
+              flex: '1',
+              padding: '10px',
+              border: '1px solid red',
+              borderRadius: '5px',
+              backgroundColor: 'black',
+              color: 'white',
+            }}
+          />
+          <button
+            onClick={handleComment}
+            style={{
+              backgroundColor: 'red',
+              color: 'white',
+              border: 'none',
+              padding: '10px 15px',
+              borderRadius: '5px',
+              cursor: 'pointer',
+              textTransform: 'uppercase',
+            }}
+          >
+            Post
+          </button>
+        </div>
 
         <div>
           {comment.split(',').map((c, index) => (
-            <p key={index}>
-              {c === "" ? "" : (
-                <>
-                  <FaUserCircle /> Anonymous User 
-                </>
-              )} <br /> {c.trim()}
-            </p>
+            c.trim() && (
+              <div
+                key={index}
+                style={{
+                  backgroundColor: 'black',
+                  padding: '10px',
+                  borderRadius: '5px',
+                  marginBottom: '10px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                }}
+              >
+                <FaUserCircle style={{ fontSize: '24px', color: 'red' }} />
+                <div>
+                  <p style={{ margin: '0', color: 'red', fontFamily:'monospace' }}>Anonymous User</p>
+                  <p style={{ margin: '0', color: 'white' }}>{c}</p>
+                </div>
+              </div>
+            )
           ))}
         </div>
-
       </div>
-
     </div>
-
   );
 }
 
