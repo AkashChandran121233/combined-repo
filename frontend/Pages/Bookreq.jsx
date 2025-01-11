@@ -19,7 +19,7 @@ function Bookreq() {
 
 
   const handleClose = (close) => {
-    axios.delete('http://localhost:3001/bookrequest', { data: { _id: close._id } })
+    axios.delete('https://librarymanagement-1-s431.onrender.com/bookrequest', { data: { _id: close._id } })
       .then(result => {
         console.log(result)
       })
@@ -40,7 +40,7 @@ function Bookreq() {
   useEffect(() => {
     if (userDetails.email) {  // Ensure email is available before making the request
       axios
-        .get(`http://localhost:3001/bookrequest?emailID=${userDetails.email}`)
+        .get(`https://librarymanagement-1-s431.onrender.com/bookrequest?emailID=${userDetails.email}`)
         .then((response) => {
           console.log('Fetched data:', response.data);
           setDisplay(response.data);  // Set the books in state
