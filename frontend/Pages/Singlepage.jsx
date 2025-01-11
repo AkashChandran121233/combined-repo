@@ -65,7 +65,7 @@ function SinglePage() {
     if (!inputComment.trim()) return;
     axios.put('http://localhost:3001/comment', { title: book.title, inputComment })
       .then(() => {
-        setComment((prev) => ${prev},${inputComment});
+        setComment((prev) => `${prev},${inputComment}`);
         setInputComment("");
       })
       .catch((err) => console.error('Error adding comment:', err));
