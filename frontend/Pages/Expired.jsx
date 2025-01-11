@@ -6,7 +6,7 @@ function Expired() {
     const [Expiry,setExpiryTime] = useState()
 
     useEffect(() => {
-        axios.get('http://localhost:3001/expire')
+        axios.get('https://librarymanagement-1-s431.onrender.com/expire')
             .then((response) => {
                 setExpiryTime(response.data);
             })
