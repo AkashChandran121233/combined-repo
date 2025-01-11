@@ -10,7 +10,7 @@ function Books() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        axios.get('http://localhost:3001/books')
+        axios.get('https://librarymanagement-1-s431.onrender.com/books')
             .then((response) => {
                 setBooks(response.data);
             })
