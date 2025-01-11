@@ -33,7 +33,7 @@ const ProfilePage = () => {
   useEffect(() => {
     if (userDetails?.email) {
       axios
-        .get(`http://localhost:3001/profile?emailID=${userDetails.email}`)
+        .get(`https://librarymanagement-1-s431.onrender.com/profile?emailID=${userDetails.email}`)
         .then((response) => {
           setCount(response.data);
         })
@@ -54,7 +54,7 @@ const ProfilePage = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post("http://localhost:3001/profile", {
+      const response = await axios.post("https://librarymanagement-1-s431.onrender.com/profile", {
         email: userDetails.email,
         age: userDetails.age,
         education: userDetails.education,
