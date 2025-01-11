@@ -41,7 +41,7 @@ const Signup = () => {
   const [errorMessage, setErrorMessage] = useState("")
   const handleSubmit = (e) => {
     e.preventDefault();
-    axios.post('http://localhost:3001/signup', { name, place, age, email, password, education, contact, phone,NoOfBooks: 0 })
+    axios.post('https://librarymanagement-1-s431.onrender.com/signup', { name, place, age, email, password, education, contact, phone,NoOfBooks: 0 })
       .then(result => {
         console.log(result)
         navigate('/login')
